@@ -1,0 +1,57 @@
+create database TernurinDB;
+use ternurindb;
+
+CREATE TABLE Ternurin(
+
+id INT auto_increment primary key,
+
+nombre varchar (255),
+
+descripcion TEXT,
+
+imagen VARCHAR(255)
+
+);
+
+
+CREATE TABLE Usuarios(
+
+id INT auto_increment primary key,
+
+email varchar(50) unique not null,
+
+username varchar(50) unique not null,
+
+password varchar(255) not null
+
+);
+
+ 
+CREATE TABLE Ternurines_Personalizados (
+
+    id INT auto_increment primary key,
+
+    id_usuario INT,
+
+    id_ternurin INT,
+
+    nombre varchar(255),
+
+    apellido varchar(255),
+
+    fecha_nacimiento DATE,
+
+    genero CHAR(1),
+
+    estado_nacimiento varchar(255),
+
+    FOREIGN KEY(id_usuario) REFERENCES Usuarios(id) ON delete CASCADE,
+
+    FOREIGN KEY(id_ternurin) REFERENCES Ternurin(id)
+
+);
+
+alter table Usuarios add role varchar(255);
+ 
+ update Usuarios set role = 'admin'where username= 'Aleczx13';
+
