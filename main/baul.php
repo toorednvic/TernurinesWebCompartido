@@ -101,9 +101,11 @@ if (!empty($ternurines)) {
         echo '<p class="card-text">Género: ' . ($row["genero"] ? $row["genero"] : '') . '</p>';  
         echo '<p class="card-text">Estado de nacimiento: ' . ($row["estado_nacimiento"] ? $row["estado_nacimiento"] : '') . '</p>';
         echo '<a href="editar.php?id=' . $row["id"] . '" class="btn btn-secondary">Editar</a>';
+        echo '<a href ="generar_curp.php?id=' . $row["id"].'" class = "btn btn-primary"> Generar CURP</a>';
         echo '<form action="eliminar.php" method="POST" onsubmit="return confirm(\'¿Estas seguro de que quieres eliminar este ternurin del baul?\');">';
         echo '<input type="hidden" name="id" value="' . $row["id"] . '">';
         echo '<button type="submit" class="btn btn-danger">Eliminar</button>';
+
         echo '</form>';
         echo '</div>';    
         echo '</div>';
