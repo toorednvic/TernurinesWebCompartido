@@ -10,8 +10,10 @@ Register.php
 
 
 ----Login
-Se agrego sección para obtener el codigo del usuario que se genero al registrarse 
+Se agrego sección para obtener el codigo del usuario que se genero al registrarse .
+
 Se agrego campo para ingresar el código del autenticador
+
 
 ****Verificar lo mismo que en el paso 3 del punto del registro.**********
 
