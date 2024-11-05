@@ -1,8 +1,11 @@
 # TernurinesWebCompartido
 TernurinesWebCompartido 
 Register.php
+
 1.Se agrego la generación del código en la línea 69.
+
 2.Hacer cambios hacia la tabla de usuarios para agregar la columna codigoauth
+
 3.Se cambio el como regresa los errores y el mensaje de exito en el método register y se agrego para que al registrarse regrese el QR que la persona va a escanear para registrar.
 
 
