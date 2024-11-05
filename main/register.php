@@ -1,4 +1,5 @@
 <?php
+use PragmaRX\Google2FA\Google2FA;
 include 'database.php';
 
 //se define una nueva clase que contiene los metodos con sus propiedades para poder intercatcar 
@@ -38,42 +39,87 @@ class User {
             
             // validacion de datos  con un filto especial 
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                return "El correo electronico no tiene un formato valido";
+                return [
+                    "success" => false,
+                    "mensaje" => "El correo electronico no tiene un formato valido"
+                ];
+                
+              //  return "El correo electronico no tiene un formato valido";
             }            if (strlen($username) < 5) {
-                return "El nombre de usuario debe tener al menos 5 caracteres";
+                return [
+                    "success" => false,
+                    "mensaje" => "El nombre de usuario debe tener al menos 5 caracteres"
+                ];
+                // return "El nombre de usuario debe tener al menos 5 caracteres";
             }            if (strlen($password) < 8) {
-                return "La contraseña debe tener al menos 8 caracteres";
+               
+                return [
+                    "success" => false,
+                    "mensaje" => "La contraseña debe tener al menos 8 caracteres"
+                ];
+               // return "La contraseña debe tener al menos 8 caracteres";
                 //verifica si ya paso por el meotod anterior, o sea que si e usuario ya existe o no
-            }            if ($this->userExist($email, $username)){
+            }            
+            if ($this->userExist($email, $username)){
                 $stmt = $this->db->connection->prepare("SELECT * FROM Usuarios WHERE email = ?");
                 $stmt->bind_param("s", $email);
                 $stmt->execute();
                 $stmt->store_result();
                 if ($stmt->num_rows > 0) {
-                    return "El correo electronico ya existe";
-                }                $stmt = $this->db->connection->prepare("SELECT * FROM Usuarios WHERE username = ?");
+                    return [
+                        "success" => false,
+                        "mensaje" => "El correo electronico ya existe"
+                    ];
+                    //return "El correo electronico ya existe";
+                }                
+                $stmt = $this->db->connection->prepare("SELECT * FROM Usuarios WHERE username = ?");
                 $stmt->bind_param("s", $username);
                 $stmt->execute();
                 $stmt->store_result();
                 if ($stmt->num_rows > 0) {
-                    return "El nombre de usuario ya existe";
-                }            }     
+                    return [
+                        "success" => false,
+                        "mensaje" => "El nombre de usuario ya existe"
+                    ];
+                 //   return "El nombre de usuario ya existe";
+                }            
+            }     
                 
-                // si no existen inserta el nuevo usuario
-                $hashed_password = password_hash($password, PASSWORD_DEFAULT); // hash a la contrasena
-                $stmt = $this->db->connection->prepare("INSERT INTO Usuarios (email, username, password) VALUES (?, ?, ?)");
-            $stmt->bind_param("sss", $email, $username, $hashed_password); // alamecena ara usarlo en el login
+            // si no existen inserta el nuevo usuario
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT); // hash a la contrasena
+        ///*********************************************************************************************************** */
+           //Se agrego la autenticacion 
+            $googleauth= new Google2FA();
+            $codigo= $googleauth->generateSecretKey();
+            //Se agrego una nueva columna donde irá la clave del auth
+            //TODO: CAMBIAR EN LA BASE DE DATOS AGREGANDO NUEVA COLUMNA
+            $stmt = $this->db->connection->prepare("INSERT INTO Usuarios (email, username, password, codigoauth) VALUES (?, ?, ?,?)");
+            $stmt->bind_param("sss", $email, $username, $hashed_password,$codigo); // alamecena ara usarlo en el login
             $stmt->execute();
 
             
             if ($stmt->affected_rows > 0) {
                 $stmt->close();
-                return "Usuario registrado exitosamente";
+                //Generacion del código QR 
+                $codigoQR = $googleauth->getQRCodeUrl('Ternurines', $email, $codigo);
+                return [
+                    "success" => true,
+                    "codigoqr" => $codigoQR
+                ];
+              //  return "Usuario registrado exitosamente";
             } else {
                 $stmt->close();
-                return "Algo fallo en el registro del usuario";
+                return [
+                    "success" => false,
+                    "mensaje" => "Algo fallo en el registro del usuario"
+                ];
+              //  return "Algo fallo en el registro del usuario";
             }        } catch (Exception $e) {
-            return "Error: " . $e->getMessage();
+                return [
+                    "success" => false,
+                    "mensaje" => "Error: " . $e->getMessage()
+                ];
+           // return "Error: " . $e->getMessage();
         }    }
 }
 $db = new db();
@@ -84,10 +130,13 @@ if($_SERVER['REQUEST_METHOD']== 'POST'){
 
 if (isset($_POST['email']) && isset($_POST['username']) && isset($_POST['password'])) {
     $result = $user->register($_POST['email'], $_POST['username'], $_POST['password']);
-    if ($result === true) {
+   // if ($result === true) {
+   if($result['success']){
         $message = "Usuario registrado exitosamente";
+        $codigoQRUrl = $result['codigoqr'];
     } else {
-        $message = $result; //  mensaje de error
+        //$message = $result; //  mensaje de error
+        $message=$result['mensaje'];
     }
 } 
 }
@@ -130,7 +179,12 @@ if (isset($_POST['email']) && isset($_POST['username']) && isset($_POST['passwor
 </div>
 </div>
         </form>
-    
+        <?php if (isset($codigoQRUrl)): ?>
+            <div >
+                <h3>Código QR generado</h3>
+                <img src="<?php echo $codigoQRUrl; ?>" alt="QR" />
+            </div>
+        <?php endif; ?>
 </body>
        
     <script>

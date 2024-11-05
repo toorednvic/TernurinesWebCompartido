@@ -1,60 +1,72 @@
-<?php
-session_start(); 
- 
-include 'database.php';
- 
-class User {
-    private $db;
- 
-    public function __construct($db) {
-        $this->db = $db;
-    }
- 
-    public function login($username, $password) {
-        try {
-            $stmt = $this->db->connection->prepare("SELECT * FROM Usuarios WHERE username = ?");
-            $stmt->bind_param("s", $username);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            if ($result->num_rows > 0) {
+    <?php
+    session_start(); 
+    use PragmaRX\Google2FA\Google2FA;
+    include 'database.php';
+    
+    class User {
+        private $db;
+    
+        public function __construct($db) {
+            $this->db = $db;
+        }
+    //TODO: Verificar el como reaccionan los return
+        public function login($username, $password, $codigoAutenticador)  {
+            try {
+                $stmt = $this->db->connection->prepare("SELECT * FROM Usuarios WHERE username = ?");
+                $stmt->bind_param("s", $username);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                if ($result->num_rows > 0) {
 
-                
-                $user = $result->fetch_assoc();
-                
-                if (password_verify($password, $user['password'])) {
-                    $_SESSION['id_usuario'] = $user['id'];
-                    $_SESSION['role'] = $user['role'];
-                    $_SESSION['username'] =$username;
-                    return true;
+                    
+                    $user = $result->fetch_assoc();
+                   
+                    if (password_verify($password, $user['password'])) {
+                       
+                         //obtenrt vcodigo  del usuario de la columna codigoauth
+                        $codigoauth=$user['codigoauth'];
+                         //Se agrego la autenticacion 
+                        $googleauth= new Google2FA();
+
+                        if($googleauth->verifyKey($codigoauth, $codigoAutenticador)){
+                            
+                            $_SESSION['id_usuario'] = $user['id'];
+                            $_SESSION['role'] = $user['role'];
+                            $_SESSION['username'] =$username;
+                            return true;
+                        } else {
+                            return "Código de autenticación incorrectozzzz";
+                        }  
+                        
+                    } else {
+                        return "Contraseña incorrecta para el usuario: " . $username;
+                    }
                 } else {
-                    return "Contraseña incorrecta para el usuario: " . $username;
+                    return "El nombre de usuario no existe: " . $username;
                 }
-            } else {
-                return "El nombre de usuario no existe: " . $username;
+            } catch (Exception $e) {
+                return "Error: " . $e->getMessage();
             }
-        } catch (Exception $e) {
-            return "Error: " . $e->getMessage();
         }
     }
-}
- 
-$db = new db();
-$user = new User($db);
- 
-if (isset($_POST['username']) && isset($_POST['password'])) {
-    $result = $user->login($_POST['username'], $_POST['password']);
-    if ($result === true) {
-        if ($_SESSION['role'] == 'admin') {
-            header('Location: Usuarios.php');
+    
+    $db = new db();
+    $user = new User($db);
+    
+    if (isset($_POST['username']) && isset($_POST['password'])&& isset($_POST['codigoAutenticador'])) {
+        $result = $user->login($_POST['username'], $_POST['password'], $_POST['codigoAutenticador']);
+        if ($result === true) {
+            if ($_SESSION['role'] == 'admin') {
+                header( 'Location: Usuarios.php');
+            } else {
+                header('Location: home.php');
+            }
+            exit;
         } else {
-            header('Location: home.php');
+            $_SESSION['message'] = $result; // guarda el mensaje de error en la sesión
         }
-        exit;
-    } else {
-        $_SESSION['message'] = $result; // guarda el mensaje de error en la sesión
     }
-}
-?>
+    ?>
 
 
 <!DOCTYPE html>
@@ -83,6 +95,12 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
         <label for="psw"><b>Contraseña</b></label>
         <input type="password" placeholder="Ingresa una contraseña" name="password" required>
 </div>
+<!-- CODIGO NUEVO  -->
+<div class="input-group">
+            <label for="codigoAutenticador"><b>Código de Autenticación (OTP)</b></label>
+            <input type="text" placeholder="Ingresa código de autenticación" name="codigoAutenticador" required>
+        </div>
+        <!-- FIN CODIGO NUEVO  -->
 <div class="input-group">
 <input type="submit" value="Iniciar Sesión" class="submit-btn">
 </div>
