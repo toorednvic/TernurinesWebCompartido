@@ -5,7 +5,7 @@ class db {
     //propiedades para la conexion a la bd
     private $host = "localhost";
     private $username = "root";
-    private $password = "12345";
+    private $password = "";
     private $database = "TernurinDB";
 
     

@@ -1,5 +1,7 @@
     <?php
     session_start(); 
+    require_once __DIR__ . '/../vendor/autoload.php';
+
     use PragmaRX\Google2FA\Google2FA;
     include 'database.php';
     
