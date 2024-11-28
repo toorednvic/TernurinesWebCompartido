@@ -112,7 +112,7 @@ if (isset($_GET['id'])) {
             $pdf->Cell(0, 10, $estado_nacimiento, 0, 1, 'L');
  
             // sello
-            $pdf->AddSeal(150, 45, 'sello.jpeg'); 
+            $pdf->AddSeal(150, 45, 'imgSellojpg'); 
  
             $pdf->Output();
         } else {

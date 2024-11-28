@@ -181,3 +181,60 @@ iframe {
     transform: scale(1);
     /* Sin agrandamiento al hacer clic */
 }
+
+/* Basic reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Navbar container */
+  .navbar {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    background-color: #ffd6e8; /* Light pink pastel */
+    padding: 15px 30px;
+    border-radius: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: 'Comic Sans MS', sans-serif; /* Playful font */
+  }
+  
+  /* Nav links */
+  .nav-link {
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    color: #555; /* Soft gray */
+    font-size: 1rem;
+    background-color: #ffe6fa; /* Lightest pink */
+    transition: all 0.3s ease;
+  }
+  
+  /* Hover effect */
+  .nav-link:hover {
+    background-color: #ffb6c1; /* Slightly darker pink */
+    color: #fff;
+    transform: scale(1.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Active link style */
+  .nav-link.active {
+    background-color: #ff92b0; /* Brighter pink for active link */
+    color: #fff;
+  }
+  
+  /* Media Query for responsiveness */
+  @media (max-width: 600px) {
+    .navbar {
+      flex-direction: column;
+      gap: 15px;
+    }
+    .nav-link {
+      width: 100%;
+      text-align: center;
+    }
+  }
+  

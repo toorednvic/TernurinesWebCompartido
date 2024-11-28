@@ -10,7 +10,7 @@ header("Location: login.php");
 exit;
 
 }
-         include 'header.php';
+        // include 'header.php';
          include 'database.php';
          
          class Ternurin {
@@ -88,28 +88,37 @@ exit;
 <?php
 if (!empty($ternurines)) {
     foreach ($ternurines as $row) {       
-            echo '<div class="card">';    
-                      echo '<img class="card-img-top" src="' . $row["imagen"] . '" alt="Imagen de ternurin">';
- 
-               echo '<div class="card-body">';
-        echo '<p class="card-text">Descripcion: ' . ($row["descripcion"] ? $row["descripcion"]: ''). '</p>';
- 
+        echo '<div class="card">';    
+        echo '<img class="card-img-top" src="' . $row["imagen"] . '" alt="Imagen de ternurin">';
+
+        echo '<div class="card-body">';
+        echo '<p class="card-text">Descripcion: ' . ($row["descripcion"] ? $row["descripcion"]: '') . '</p>';
+
         echo '<h5 class="card-title"> ' . $row["nombre"] . '</h5>';
-       // echo '<p class="card-text">Nombre: ' . ($row["nombre"] ? $row["nombre"] : '') . '</p>';
         echo '<p class="card-text">Apellido: ' . ($row["apellido"] ? $row["apellido"] : '') . '</p>';
         echo '<p class="card-text">Fecha de nacimiento: ' . ($row["fecha_nacimiento"] ? $row["fecha_nacimiento"] : '') . '</p>';
         echo '<p class="card-text">Género: ' . ($row["genero"] ? $row["genero"] : '') . '</p>';  
         echo '<p class="card-text">Estado de nacimiento: ' . ($row["estado_nacimiento"] ? $row["estado_nacimiento"] : '') . '</p>';
+
+        // Separando los botones
+        echo '<div class="btn-group" role="group" aria-label="Botones de acción">';
+        echo '<div class="mt-1">';  // Separa con margen superior
+
         echo '<a href="editar.php?id=' . $row["id"] . '" class="btn btn-secondary">Editar</a>';
-        echo '<a href ="generar_curp.php?id=' . $row["id"].'" class = "btn btn-primary"> Generar CURP</a>';
+        echo '<div class="mt-1">';  // Separa con margen superior
+        echo '<a href="generar_curp.php?id=' . $row["id"] . '" class="btn btn-primary" target="_blank">Generar CURP</a>';
+        echo '</div>'; // Cierre del div con margen superior     
+
         echo '<form action="eliminar.php" method="POST" onsubmit="return confirm(\'¿Estas seguro de que quieres eliminar este ternurin del baul?\');">';
         echo '<input type="hidden" name="id" value="' . $row["id"] . '">';
-        echo '<button type="submit" class="btn btn-danger">Eliminar</button>';
+        echo '<button type="submit" class="btn btn-danger mt-1">Eliminar</button>'; // Añadir margen superior
 
         echo '</form>';
         echo '</div>';    
         echo '</div>';
     }
+
+
 } else {
     echo "No tienes ningún ternurin en tu baul";
 }
